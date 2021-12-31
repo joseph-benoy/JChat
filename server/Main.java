@@ -1,6 +1,47 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.net.*;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+class ClientReader implements Runnable{
+    Server server;
+    Socket soc;
+    ClientReader(Server s,Socket soc){
+        this.server = s;
+        this.soc = soc;
+    }
+    public void run(){
+
+    }
+}
+class Message{
+    
+}
+class Server{
+    LinkedList<DataInputStream>inputs = new LinkedList<DataInputStream>();
+    LinkedList<DataOutputStream>outputs = new LinkedList<DataOutputStream>();
+    Stack<Message>messages = new Stack<Message>();
+    public void startServer(int port,int limit){
+        try{
+            ServerSocket server = new ServerSocket(port);
+            ExecutorService readerPool = Executors.newFixedThreadPool(limit);
+            while(Boolean.parseBoolean("true")){
+                Socket s = server.accept();
+                ClientReader c = new ClientReader(this,s);
+                outputs.add(new DataOutputStream(s.getOutputStream()));
+                readerPool.execute(c);
+            }
+            readerPool.shutdown();
+            server.close();
+        }
+        catch(Exception e){
+            System.out.println(e.getLocalizedMessage());
+        }
+    }
+}
 public class Main extends JFrame{
     Main(){
         JDialog portForm = new JDialog(this,"Server details",true);
@@ -49,7 +90,7 @@ public class Main extends JFrame{
         portForm.setVisible(true);
         JLabel portAddr = new JLabel("Port number : "+port.getText());
         portAddr.setBounds(20,20,190,30);
-        JLabel limitClient = new JLabel("Client limits : "+limit.getText());
+        JLabel limitClient = new JLabel("Client limit : "+limit.getText());
         limitClient.setBounds(195,20,190,30);
         JLabel logl = new JLabel("Logs");
         logl.setBounds(20,60,190,30);
@@ -61,29 +102,6 @@ public class Main extends JFrame{
         add(limitClient);
         add(logl);
         add(logList);
-        logListModel.addElement("this");
-        logListModel.addElement("this");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
-        logListModel.addElement("dddd");
         JScrollPane scroll = new JScrollPane(logList,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scroll.setBounds(20, 90, 360, 230);
         add(scroll);
