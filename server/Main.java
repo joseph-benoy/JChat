@@ -18,7 +18,22 @@ class ClientReader implements Runnable{
     }
 }
 class Message{
-    
+    Date dateTime;
+    String text,sender;
+    Message(String sender,Date d,String t){
+        this.sender = sender;
+        this.dateTime = d;
+        this.text = t;
+    }
+    public Date getDate(){
+        return this.dateTime;
+    }
+    public String getText(){
+        return this.text;
+    }
+    public String getSender(){
+        return this.sender;
+    }
 }
 class Server{
     LinkedList<DataInputStream>inputs = new LinkedList<DataInputStream>();
@@ -31,6 +46,7 @@ class Server{
             while(Boolean.parseBoolean("true")){
                 Socket s = server.accept();
                 ClientReader c = new ClientReader(this,s);
+                inputs.add(new DataInputStream(s.getInputStream()));
                 outputs.add(new DataOutputStream(s.getOutputStream()));
                 readerPool.execute(c);
             }
