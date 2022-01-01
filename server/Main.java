@@ -6,26 +6,38 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.time.LocalTime;
 class ClientReader implements Runnable{
     Server server;
     Socket soc;
-    ClientReader(Server s,Socket soc){
+    DataInputStream sin;
+    ClientReader(Server s,Socket soc) throws IOException{
         this.server = s;
         this.soc = soc;
+        this.sin = new DataInputStream(soc.getInputStream());
     }
     public void run(){
-
+        try{
+            String message="";
+            while(!message.equals("STOP")){
+                message = this.sin.readUTF();
+                this.server.addMessage(message.substring(0,message.indexOf(":-")), LocalTime.now(), message);
+            }
+        }
+        catch(Exception e){
+            System.out.println(e.getLocalizedMessage());
+        }
     }
 }
 class Message{
-    Date dateTime;
+    LocalTime dateTime;
     String text,sender;
-    Message(String sender,Date d,String t){
+    Message(String sender,LocalTime d,String t){
         this.sender = sender;
         this.dateTime = d;
         this.text = t;
     }
-    public Date getDate(){
+    public LocalTime getDate(){
         return this.dateTime;
     }
     public String getText(){
@@ -56,6 +68,9 @@ class Server{
         catch(Exception e){
             System.out.println(e.getLocalizedMessage());
         }
+    }
+    public void addMessage(String sender,LocalTime d,String message){
+        messages.push(new Message(sender, d, message));
     }
 }
 public class Main extends JFrame{
