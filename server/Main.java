@@ -37,8 +37,8 @@ class Message{
         this.dateTime = d;
         this.text = t;
     }
-    public LocalTime getDate(){
-        return this.dateTime;
+    public String getDate(){
+        return this.dateTime.getHour()+":"+this.dateTime.getMinute();
     }
     public String getText(){
         return this.text;
@@ -48,18 +48,25 @@ class Message{
     }
 }
 class Server{
+    Main ui;
     LinkedList<DataInputStream>inputs = new LinkedList<DataInputStream>();
     LinkedList<DataOutputStream>outputs = new LinkedList<DataOutputStream>();
     Stack<Message>messages = new Stack<Message>();
+    ServerSocket server;
+    Server(Main u){
+        this.ui = u;
+    }
     public void startServer(int port,int limit){
         try{
-            ServerSocket server = new ServerSocket(port);
+            server = new ServerSocket(port);
             ExecutorService readerPool = Executors.newFixedThreadPool(limit);
+            System.out.println("Server started!");
             while(Boolean.parseBoolean("true")){
                 Socket s = server.accept();
                 ClientReader c = new ClientReader(this,s);
                 inputs.add(new DataInputStream(s.getInputStream()));
                 outputs.add(new DataOutputStream(s.getOutputStream()));
+                this.ui.addNewConnection(new DataInputStream(s.getInputStream()).readUTF());
                 readerPool.execute(c);
             }
             readerPool.shutdown();
@@ -69,11 +76,19 @@ class Server{
             System.out.println(e.getLocalizedMessage());
         }
     }
+    public void stopServer() throws IOException{
+        this.server.close();
+    }
     public void addMessage(String sender,LocalTime d,String message){
         messages.push(new Message(sender, d, message));
+        notifyAll();
     }
 }
 public class Main extends JFrame{
+    DefaultListModel<String> logListModel = new DefaultListModel<String>();
+    public void addNewConnection(String name){
+        logListModel.addElement(name+" joined on "+LocalTime.now().getHour()+":"+LocalTime.now().getMinute());
+    }
     Main(){
         JDialog portForm = new JDialog(this,"Server details",true);
         JLabel pLabel = new JLabel("Port address");
@@ -82,6 +97,7 @@ public class Main extends JFrame{
         JTextField limit = new JTextField();
         JButton startBtn = new JButton("start server");
         JLabel portFormError = new JLabel("",SwingConstants.CENTER);
+        Server server = new Server(this);
         portFormError.setBounds(30,180,120,20);
         portForm.addWindowListener(new WindowAdapter(){
             public void windowClosing(WindowEvent e){
@@ -125,9 +141,8 @@ public class Main extends JFrame{
         limitClient.setBounds(195,20,190,30);
         JLabel logl = new JLabel("Logs");
         logl.setBounds(20,60,190,30);
-        DefaultListModel<String> logListModel = new DefaultListModel<String>();
         JList<String> logList = new JList<String>();
-        logList.setModel(logListModel);
+        logList.setModel(this.logListModel);
         logList.setBounds(20,90,360,50);
         add(portAddr);
         add(limitClient);
@@ -139,10 +154,22 @@ public class Main extends JFrame{
         JButton stopBtn = new JButton("shutdown");
         stopBtn.setBounds(100,330,190,30);
         add(stopBtn);
+        addWindowListener(new WindowAdapter(){
+            public void windowClosing(WindowEvent e){
+                try{
+                    server.stopServer();
+                    System.exit(0);
+                }
+                catch(Exception er){
+                    System.out.println(er.getLocalizedMessage());
+                }
+            }
+        });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(400,430);  
         setLayout(null);  
-        setVisible(true);  
+        setVisible(true);
+        server.startServer(Integer.parseInt(port.getText()), Integer.parseInt(limit.getText()));  
     }
     public static void main(String[] args) {
         new Main();
