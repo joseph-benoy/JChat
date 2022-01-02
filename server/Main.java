@@ -21,11 +21,14 @@ class ClientReader implements Runnable{
             String message="";
             while(!message.equals("STOP")){
                 message = this.sin.readUTF();
-                this.server.addMessage(message.substring(0,message.indexOf(":-")), LocalTime.now(), message);
+                synchronized(this.server){
+                    this.server.addMessage(message.substring(0,message.indexOf(":-")), LocalTime.now(), message);
+                }
+                System.out.println(message);
             }
         }
         catch(Exception e){
-            System.out.println(e.getLocalizedMessage());
+            System.out.println("dddd"+e.getLocalizedMessage());
         }
     }
 }
@@ -81,7 +84,7 @@ class Server{
     }
     public void addMessage(String sender,LocalTime d,String message){
         messages.push(new Message(sender, d, message));
-        notifyAll();
+        this.notifyAll();
     }
 }
 public class Main extends JFrame{
