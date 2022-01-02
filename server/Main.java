@@ -156,6 +156,17 @@ public class Main extends JFrame{
         add(scroll);
         JButton stopBtn = new JButton("shutdown");
         stopBtn.setBounds(100,330,190,30);
+        stopBtn.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                try{
+                    server.stopServer();
+                    System.exit(0);
+                }
+                catch(Exception er){
+                    System.out.println(er.getLocalizedMessage());
+                }
+            }
+        });
         add(stopBtn);
         addWindowListener(new WindowAdapter(){
             public void windowClosing(WindowEvent e){
