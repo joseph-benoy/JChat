@@ -44,10 +44,12 @@ class ConnectionHandler{
     }
     public void sendMessage(String message){
         try{
-            this.ui.addOwnMessage(message);
-            message = this.username+": "+message;
-            dout.writeUTF(message);
-            dout.flush();
+            if(!message.equals("")){
+                this.ui.addOwnMessage(message);
+                message = this.username+": "+message;
+                dout.writeUTF(message);
+                dout.flush();
+            }
         }
         catch(Exception e){
             System.out.println(e.getLocalizedMessage());
