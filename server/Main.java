@@ -23,6 +23,7 @@ class ClientReader implements Runnable{
                 message = this.sin.readUTF();
                 synchronized(this.server){
                     this.server.addMessage(message.substring(0,message.indexOf(":-")), LocalTime.now(), message);
+                    this.server.sendMessage(message.substring(0,message.indexOf(":-"))+": "+message.substring(message.indexOf(":-")+1));
                 }
                 System.out.println(message);
             }
@@ -79,15 +80,15 @@ class Server{
             System.out.println(e.getLocalizedMessage());
         }
     }
-    public void sendMessage(){
+    public void sendMessage(String message){
         try{
-            while(Boolean.parseBoolean("true")){
-                if(!messages.empty()){
-                    Message message = messages.peek();
-                    for(DataOutputStream out:outputs){
-                        out.writeUTF(message.getSender()+": "+message.getText());
-                        out.flush();
-                    }
+            for(DataOutputStream out:outputs){
+                try{
+                    out.writeUTF(message);
+                    out.flush();
+                }
+                catch(Exception e){
+                    System.out.print("thththththt");
                 }
             }
         }

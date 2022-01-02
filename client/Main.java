@@ -60,7 +60,7 @@ public class Main extends JFrame{
     JList<String> chatBox;
     JTextField messageBox ;
     JScrollPane scroll;
-    DefaultListModel<String> messageList = new DefaultListModel<String>();
+    JTextArea chats;
     public HashMap<String,String>  getUserData(){
         HashMap<String,String> data = new HashMap<>();
         data.put("username", this.username);
@@ -135,9 +135,16 @@ public class Main extends JFrame{
             }
         });
 
-        chatBox= new JList<String>();
-        chatBox.setModel(messageList);
-        chatBox.setBounds(5,5,390,200);
+
+
+        chats = new JTextArea();
+        chats.setBounds(5,5,390,200);
+        chats.setLineWrap(true);
+        chats.setWrapStyleWord(true);
+        chats.setEditable(false);
+        chats.setCaretPosition(chats.getDocument().getLength());        
+
+
         messageBox = new JTextField();
         messageBox.setBounds(5,630,320,50);
         JButton sendBtn = new JButton("send");
@@ -147,10 +154,10 @@ public class Main extends JFrame{
                 connection.sendMessage(messageBox.getText());
             }
         });
-        add(chatBox);
+        add(chats);
         add(messageBox);
         add(sendBtn);
-        scroll = new JScrollPane(chatBox,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scroll = new JScrollPane(chats,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scroll.setBounds(5, 5, 390, 610);
         this.scroll.getVerticalScrollBar().setValue(this.scroll.getVerticalScrollBar().getMaximum());
         add(scroll);
@@ -163,12 +170,12 @@ public class Main extends JFrame{
         connection.start();
     }
     public void addOwnMessage(String message){
-        this.messageList.addElement("You: "+message);
-        messageBox.setText("");
+        chats.append("You: "+message+"\n");
         this.scroll.getVerticalScrollBar().setValue(this.scroll.getVerticalScrollBar().getMaximum());
     }
     public void addMessage(String message){
-        this.messageList.addElement(message);
+        chats.append(message+"\n");
+        this.scroll.getVerticalScrollBar().setValue(this.scroll.getVerticalScrollBar().getMaximum());
     }
     public static void main(String args[]){
         new Main();
