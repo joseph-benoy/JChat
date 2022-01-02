@@ -1,4 +1,4 @@
 # JChat
 Peer-to-peer chat room
 
-### Built using Java Swing and socket package
+##### Built using Java Swing and socket package
