@@ -11,10 +11,12 @@ class ClientReader implements Runnable{
     Server server;
     Socket soc;
     DataInputStream sin;
-    ClientReader(Server s,Socket soc) throws IOException{
+    int key;
+    ClientReader(Server s,Socket soc,int key) throws IOException{
         this.server = s;
         this.soc = soc;
         this.sin = new DataInputStream(soc.getInputStream());
+        this.key = key;
     }
     public void run(){
         try{
@@ -22,7 +24,7 @@ class ClientReader implements Runnable{
             while(Boolean.parseBoolean("true")){
                 message = this.sin.readUTF();
                 synchronized(this.server){
-                    this.server.sendMessage(message);
+                    this.server.sendMessage(message,this.key);
                 }
                 System.out.println(message);
             }
@@ -34,11 +36,12 @@ class ClientReader implements Runnable{
 }
 class Server{
     Main ui;
-    LinkedList<DataOutputStream>outputs = new LinkedList<DataOutputStream>();
+    HashMap<Integer,DataOutputStream>outputs = new HashMap<>();
     ServerSocket server;
     Server(Main u){
         this.ui = u;
     }
+    int count=0;
     public void startServer(int port,int limit){
         try{
             server = new ServerSocket(port);
@@ -46,9 +49,12 @@ class Server{
             System.out.println("Server started!");
             while(Boolean.parseBoolean("true")){
                 Socket s = server.accept();
-                ClientReader c = new ClientReader(this,s);
-                outputs.add(new DataOutputStream(s.getOutputStream()));
-                this.ui.addNewConnection(new DataInputStream(s.getInputStream()).readUTF());
+                count++;
+                ClientReader c = new ClientReader(this,s,count);
+                outputs.put(count,new DataOutputStream(s.getOutputStream()));
+                String uname = new DataInputStream(s.getInputStream()).readUTF();
+                this.ui.addNewConnection(uname);
+                this.sendMessage(uname+" joined chat!",888888);
                 readerPool.execute(c);
             }
             readerPool.shutdown();
@@ -58,12 +64,16 @@ class Server{
             System.out.println(e.getLocalizedMessage());
         }
     }
-    public void sendMessage(String message){
+    public void sendMessage(String message,int key){
         try{
-            for(DataOutputStream out:outputs){
+            for(Map.Entry m:outputs.entrySet()){
+                DataOutputStream out = (DataOutputStream)m.getValue();
                 try{
-                    out.writeUTF(message);
-                    out.flush();
+                    Integer x = key;
+                    if(m.getKey()!=x){
+                        out.writeUTF(message);
+                        out.flush();
+                    }
                 }
                 catch(Exception e){
                 }

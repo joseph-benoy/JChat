@@ -162,7 +162,7 @@ public class Main extends JFrame{
         this.scroll.getVerticalScrollBar().setValue(this.scroll.getVerticalScrollBar().getMaximum());
         add(scroll);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400,getMaximumSize().height);  
+        setSize(400,750);  
         setLayout(null);
         setTitle("JChat");  
         setVisible(true);
