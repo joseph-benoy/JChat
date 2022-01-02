@@ -143,10 +143,11 @@ public class Main extends JFrame{
         chats.setWrapStyleWord(true);
         chats.setEditable(false);
         chats.setCaretPosition(chats.getDocument().getLength());        
-
+        chats.setFont(new Font("Arial Black", Font.BOLD, 15));
 
         messageBox = new JTextField();
         messageBox.setBounds(5,630,320,50);
+        messageBox.setFont(new Font("Arial Black", Font.BOLD, 12));
         JButton sendBtn = new JButton("send");
         sendBtn.setBounds(325,630,70,50);
         sendBtn.addActionListener(new ActionListener(){
