@@ -45,7 +45,7 @@ class ConnectionHandler{
     public void sendMessage(String message){
         try{
             this.ui.addOwnMessage(message);
-            message = this.username+":-"+message;
+            message = this.username+": "+message;
             dout.writeUTF(message);
             dout.flush();
         }
@@ -171,6 +171,7 @@ public class Main extends JFrame{
     }
     public void addOwnMessage(String message){
         chats.append("You: "+message+"\n");
+        this.messageBox.setText("");
         this.scroll.getVerticalScrollBar().setValue(this.scroll.getVerticalScrollBar().getMaximum());
     }
     public void addMessage(String message){

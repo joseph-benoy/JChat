@@ -22,8 +22,7 @@ class ClientReader implements Runnable{
             while(!message.equals("STOP")){
                 message = this.sin.readUTF();
                 synchronized(this.server){
-                    this.server.addMessage(message.substring(0,message.indexOf(":-")), LocalTime.now(), message);
-                    this.server.sendMessage(message.substring(0,message.indexOf(":-"))+": "+message.substring(message.indexOf(":-")+1));
+                    this.server.sendMessage(message);
                 }
                 System.out.println(message);
             }
@@ -33,29 +32,10 @@ class ClientReader implements Runnable{
         }
     }
 }
-class Message{
-    LocalTime dateTime;
-    String text,sender;
-    Message(String sender,LocalTime d,String t){
-        this.sender = sender;
-        this.dateTime = d;
-        this.text = t;
-    }
-    public String getDate(){
-        return this.dateTime.getHour()+":"+this.dateTime.getMinute();
-    }
-    public String getText(){
-        return this.text;
-    }
-    public String getSender(){
-        return this.sender;
-    }
-}
 class Server{
     Main ui;
     LinkedList<DataInputStream>inputs = new LinkedList<DataInputStream>();
     LinkedList<DataOutputStream>outputs = new LinkedList<DataOutputStream>();
-    Stack<Message>messages = new Stack<Message>();
     ServerSocket server;
     Server(Main u){
         this.ui = u;
@@ -88,7 +68,6 @@ class Server{
                     out.flush();
                 }
                 catch(Exception e){
-                    System.out.print("thththththt");
                 }
             }
         }
@@ -98,10 +77,6 @@ class Server{
     }
     public void stopServer() throws IOException{
         this.server.close();
-    }
-    public void addMessage(String sender,LocalTime d,String message){
-        messages.push(new Message(sender, d, message));
-        this.notifyAll();
     }
 }
 public class Main extends JFrame{
