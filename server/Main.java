@@ -19,7 +19,7 @@ class ClientReader implements Runnable{
     public void run(){
         try{
             String message="";
-            while(!message.equals("STOP")){
+            while(Boolean.parseBoolean("true")){
                 message = this.sin.readUTF();
                 synchronized(this.server){
                     this.server.sendMessage(message);
@@ -28,13 +28,12 @@ class ClientReader implements Runnable{
             }
         }
         catch(Exception e){
-            System.out.println("dddd"+e.getLocalizedMessage());
+            System.out.println(e.getLocalizedMessage());
         }
     }
 }
 class Server{
     Main ui;
-    LinkedList<DataInputStream>inputs = new LinkedList<DataInputStream>();
     LinkedList<DataOutputStream>outputs = new LinkedList<DataOutputStream>();
     ServerSocket server;
     Server(Main u){
@@ -48,7 +47,6 @@ class Server{
             while(Boolean.parseBoolean("true")){
                 Socket s = server.accept();
                 ClientReader c = new ClientReader(this,s);
-                inputs.add(new DataInputStream(s.getInputStream()));
                 outputs.add(new DataOutputStream(s.getOutputStream()));
                 this.ui.addNewConnection(new DataInputStream(s.getInputStream()).readUTF());
                 readerPool.execute(c);
