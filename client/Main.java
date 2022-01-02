@@ -25,6 +25,15 @@ class ConnectionHandler{
             dout = new DataOutputStream(soc.getOutputStream());
             dout.writeUTF(this.username);
             dout.flush();
+            while(Boolean.parseBoolean("true")){
+                try{
+                    String message = din.readUTF();
+                    this.ui.addMessage(message);
+                }
+                catch(Exception err){
+                    System.out.println(err.getLocalizedMessage());
+                }
+            }
         }
         catch(Exception e){
             System.out.println(e.getLocalizedMessage());
@@ -157,6 +166,9 @@ public class Main extends JFrame{
         this.messageList.addElement("You: "+message);
         messageBox.setText("");
         this.scroll.getVerticalScrollBar().setValue(this.scroll.getVerticalScrollBar().getMaximum());
+    }
+    public void addMessage(String message){
+        this.messageList.addElement(message);
     }
     public static void main(String args[]){
         new Main();

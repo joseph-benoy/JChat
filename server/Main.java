@@ -79,6 +79,22 @@ class Server{
             System.out.println(e.getLocalizedMessage());
         }
     }
+    public void sendMessage(){
+        try{
+            while(Boolean.parseBoolean("true")){
+                if(!messages.empty()){
+                    Message message = messages.peek();
+                    for(DataOutputStream out:outputs){
+                        out.writeUTF(message.getSender()+": "+message.getText());
+                        out.flush();
+                    }
+                }
+            }
+        }
+        catch(Exception e){
+            System.out.println(e.getLocalizedMessage());
+        }
+    }
     public void stopServer() throws IOException{
         this.server.close();
     }
