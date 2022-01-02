@@ -122,6 +122,11 @@ public class Main extends JFrame{
         conForm.add(port);
         conForm.add(startBtn);
         conForm.add(conFormError);
+        conForm.addWindowListener(new WindowAdapter(){
+            public void windowClosing(WindowEvent e){
+                System.exit(0);
+            }
+        });
         conForm.setSize(210,270);
         conForm.setLayout(null);
         conForm.setVisible(true);
