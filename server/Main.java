@@ -46,7 +46,6 @@ class Server{
         try{
             server = new ServerSocket(port);
             ExecutorService readerPool = Executors.newFixedThreadPool(limit);
-            System.out.println("Server started!");
             while(Boolean.parseBoolean("true")){
                 Socket s = server.accept();
                 count++;
@@ -83,8 +82,13 @@ class Server{
             System.out.println(e.getLocalizedMessage());
         }
     }
-    public void stopServer() throws IOException{
-        this.server.close();
+    public void stopServer(){
+        try{
+            this.server.close();
+        }
+        catch(Exception e){
+
+        }
     }
 }
 public class Main extends JFrame{
